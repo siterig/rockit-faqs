@@ -11,7 +11,6 @@ class FAQs extends Core
 
         register_activation_hook( __FILE__, 'activate_plugin' );
 
-
         add_filter( 'init', array( $this, 'create_cpt' ) );
         add_filter( 'init', array( $this, 'create_cpt_taxonomy' ), 0 );
         add_filter( 'plugin_action_links', array( $this, 'add_settings_link' ), 10, 2 );
@@ -181,7 +180,7 @@ class FAQs extends Core
     {
 
         add_submenu_page( 'edit.php?post_type=rockit_faq', 'Rockit FAQs Settings', 'Settings', 'manage_options', 'rockit-faqs-settings', array( $this, 'settings_page' ) );
-        add_submenu_page( 'edit.php?post_type=rockit_faq', 'Rockit FAQs Shortcode Generator', 'Shortcodes', 'manage_options', 'rockit-faqs-shortcodes', array( $this, 'shortcodes_page' ) );
+        add_submenu_page( 'edit.php?post_type=rockit_faq', 'Rockit FAQs Shortcode Generator', 'Shortcode', 'manage_options', 'rockit-faqs-shortcode', array( $this, 'shortcode_page' ) );
 
     }
 
@@ -307,9 +306,9 @@ class FAQs extends Core
     }
 
     /**
-     * Create an options page
+     * Create a shortcode generator page
      */
-    public function shortcodes_page()
+    public function shortcode_page()
     {
 
         ?>
