@@ -175,13 +175,13 @@ class FAQs extends Core
     }
 
     /**
-     * Add sub-menu for plugin settings
+     * Add sub-menus for the plugin
      */
     public function add_settings_menu()
     {
 
         add_submenu_page( 'edit.php?post_type=rockit_faq', 'Rockit FAQs Settings', 'Settings', 'manage_options', 'rockit-faqs-settings', array( $this, 'settings_page' ) );
-
+        add_submenu_page( 'edit.php?post_type=rockit_faq', 'Rockit FAQs Shortcode Generator', 'Shortcodes', 'manage_options', 'rockit-faqs-shortcodes', array( $this, 'shortcodes_page' ) );
 
     }
 
@@ -301,6 +301,89 @@ class FAQs extends Core
                 </table>
                 <?php submit_button(); ?>
             </form>
+        </div>
+        <?php
+
+    }
+
+    /**
+     * Create an options page
+     */
+    public function shortcodes_page()
+    {
+
+        ?>
+        <div class="wrap">
+            <h1>Rockit FAQs Shortcode Generator</h1>
+            <p>Change the settings below to create a shortcode to output your FAQs and then copy it to wherever you need a shortcode.</p>
+            <table class="form-table">
+                <tr valign="top">
+                    <th scope="row">Number of FAQs</th>
+                    <td>
+                        <input type="number" name="sc-number-of-faqs" id="sc-number-of-faqs" step="1" min="1" value="0">
+                        <p class="description">Limit how many FAQs to display, setting to <strong>0</strong> will show all available results</p>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">Random order?</th>
+                    <td>
+                        <p>
+                            <input type="radio" name="sc-random-order" id="sc-random-order-yes" value="yes">
+                            <label for="sc-random-order-yes">Yes</label>
+                        </p>
+                        <p>
+                            <input type="radio" name="sc-random-order" id="sc-random-order-no" value="no" checked>
+                            <label for="sc-random-order-no">No</label>
+                        </p>
+                        <p class="description">By default FAQs are ordered by <strong>date ascending</strong> (oldest first)</p>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">Show category filter?</th>
+                    <td>
+                        <p>
+                            <input type="radio" name="sc-show-category-filter" id="sc-show-category-filter-yes" value="yes" checked>
+                            <label for="sc-show-category-filter-yes">Yes</label>
+                        </p>
+                        <p>
+                            <input type="radio" name="sc-show-category-filter" id="sc-show-category-filter-no" value="no">
+                            <label for="sc-show-category-filter-no">No</label>
+                        </p>
+                        <p class="description">Hidden if <strong>Use Specific Category</strong> is set to <strong>Yes</strong></p>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">Category</th>
+                    <td>
+                        <?php
+                        $faq_categories = get_categories(
+                            array(
+                                'taxonomy' => 'faq_category',
+                                'include_children' => false,
+                            ),
+                        );
+                        ?>
+                        <select name="sc-category" id="sc-category"<?php if ( count( $faq_categories ) == 0 ) { ?> disabled<?php } ?>>
+                            <option value="0" selected><?php if ( count( $faq_categories ) == 0 ) { ?>No categories yet<?php } else { ?>All categories<?php } ?></option>
+
+                        </select>
+                        <p class="description">Select a <strong>specific category</strong> to filter FAQs to</p>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">Shortcode</th>
+                    <td>
+                        <textarea id="sc-shortcode" class="large-text" rows="3" cols="50">[rockit option=faqs]</textarea>
+                    </td>
+                </tr>
+                <tr valign="top">
+                    <th scope="row">&nbsp;</th>
+                    <td>
+                        <button type="button" class="button button-secondary" aria-label="Copy to clipboard">Copy to clipboard</button>
+                    </td>
+                </tr>
+
+            </table>
         </div>
         <?php
 
