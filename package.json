@@ -1,0 +1,26 @@
+{
+  "name": "rockit-faqs",
+  "version": "1.0.0",
+  "description": "Simple and lightweight FAQ's with categories for WordPress",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "clipboard": "^2.0.8"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/siterig/rockit-faqs.git"
+  },
+  "author": "SiteRig",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/siterig/rockit-faqs/issues"
+  },
+  "homepage": "https://github.com/siterig/rockit-faqs#readme"
+}
