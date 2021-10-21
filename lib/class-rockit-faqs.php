@@ -3,13 +3,21 @@ namespace SiteRig\Rockit;
 
 class FAQs extends Core
 {
+    public $css_cdn_sources;
+
+    public $javascript_cdn_sources;
+
     /**
      * Create a new instance
+     *
+     * @since 1.0.0
      */
     public function __construct()
     {
 
-        register_activation_hook( __FILE__, 'activate_plugin' );
+        $this->add_cdn_sources();
+
+        register_activation_hook( __FILE__, array( $this, 'activation_tasks' ) );
 
         add_filter( 'init', array( $this, 'create_cpt' ) );
         add_filter( 'init', array( $this, 'create_cpt_taxonomy' ), 0 );
@@ -22,9 +30,32 @@ class FAQs extends Core
     }
 
     /**
-     * Plugin activation tasks
+     * Add sources for cdn's
+     *
+     * @since 1.0.0
      */
-    public function activation_tasks() {
+    private function add_cdn_sources()
+    {
+
+        $this->css_cdn_sources = array(
+            'tailwindcss' => 'https://unpkg.com/tailwindcss@2.2.15/dist/tailwind.min.css',
+            'bootstrap' => 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css',
+            'foundation' => 'https://cdn.jsdelivr.net/npm/foundation-sites@6.6.3/dist/css/foundation.min.css',
+        );
+
+        $this->javascript_cdn_sources = array(
+            'alpinejs' => 'https://unpkg.com/alpinejs@3.3.3/dist/cdn.min.js',
+        );
+
+    }
+
+    /**
+     * Plugin activation tasks
+     *
+     * @since 1.0.0
+     */
+    public function activation_tasks()
+    {
 
         add_option( 'Activated_Plugin', 'rockit-faqs' );
 
@@ -32,6 +63,8 @@ class FAQs extends Core
 
     /**
      * Frequently Asked Question CPT
+     *
+     * @since 1.0.0
      */
     public function create_cpt()
     {
@@ -92,8 +125,10 @@ class FAQs extends Core
 
     /**
      * Frequently Asked Questions Taxonomy
+     *
+     * @since 1.0.0
      */
-    function create_cpt_taxonomy()
+    public function create_cpt_taxonomy()
     {
 
         $labels = array(
@@ -132,13 +167,28 @@ class FAQs extends Core
     }
 
     /**
+     * Add this plugin's type to the rockit shortcode
+     *
+     * @since 1.0.0
+     */
+    private function add_faqs_to_shortcode()
+    {
+
+        add_option_to_shortcode();
+
+    }
+
+    /**
      * Add a settings link to the plugin page entry
+     *
+     * @since 1.0.0
      *
      * @param array $links
      * @param string $file
      * @return array
      */
-    public static function add_settings_link( array $links, string $file ) : array {
+    public static function add_settings_link( array $links, string $file ) : array
+    {
 
         if ( $file === 'rockit-faqs/rockit-faqs.php' && current_user_can( 'manage_options' ) ) {
             $url = admin_url( 'edit.php?post_type=rockit_faq&page=rockit-faqs-settings' );
@@ -158,7 +208,7 @@ class FAQs extends Core
      * @param string $translation
      * @return string Customized string for title
      */
-    public function change_title_placeholder( $translation )
+    public function change_title_placeholder( string $translation ) : string
     {
 
         global $post;
@@ -170,6 +220,30 @@ class FAQs extends Core
             }
         }
         return $translation;
+
+    }
+
+    /**
+     * Enqueue css library from CDN
+     *
+     * @since 1.0.0
+     */
+    public function enqueue_css_from_cdn() {
+
+
+        /*<script defer src="https://unpkg.com/alpinejs@3.3.3/dist/cdn.min.js"></script>*/
+
+    }
+
+    /**
+     * Enqueue javascript library from CDN
+     *
+     * @since 1.0.0
+     */
+    public function enqueue_javascript_from_cdn() {
+
+
+        /*<script defer src="https://unpkg.com/alpinejs@3.3.3/dist/cdn.min.js"></script>*/
 
     }
 
@@ -220,12 +294,12 @@ class FAQs extends Core
                             $display_mode = get_option('rockit_faqs_display_mode');
                             ?>
                             <p>
-                                <input type="radio" name="rockit_faqs_display_mode" id="display-mode-collapse-expand" value="collapse-expand"<?php if ( $display_mode == 'collapse-expand' ) { ?> checked<?php } ?>>
-                                <label for="display-mode-collapse-expand">Collapse/Expand</label>
+                                <input type="radio" name="rockit_faqs_display_mode" id="rockit_faqs_display_mode_collapse_expand" value="collapse-expand"<?php if ( $display_mode == 'collapse-expand' ) { ?> checked<?php } ?>>
+                                <label for="display_mode_collapse_expand">Collapse/Expand</label>
                             </p>
                             <p>
-                                <input type="radio" name="rockit_faqs_display_mode" id="display-mode-list" value="list"<?php if ( $display_mode == 'list' ) { ?> checked<?php } ?>>
-                                <label for="display-mode-list">List</label>
+                                <input type="radio" name="rockit_faqs_display_mode" id="rockit_faqs_display_mode_list" value="list"<?php if ( $display_mode == 'list' ) { ?> checked<?php } ?>>
+                                <label for="display_mode_list">List</label>
                             </p>
                         </td>
                     </tr>
@@ -239,7 +313,7 @@ class FAQs extends Core
                             <?php
                             $css_library = get_option('rockit_faqs_css_library');
                             ?>
-                            <select name="rockit_faqs_css_library">
+                            <select name="rockit_faqs_css_library" id="rockit_faqs_css_library">
                                 <option value="tailwindcss"<?php if ( $css_library == 'tailwindcss' || $css_library == '' ) { ?> selected<?php } ?>>TailwindCSS</option>
                                 <option value="bootstrap"<?php if ( $css_library == 'bootstrap' ) { ?> selected<?php } ?>>Bootstrap</option>
                                 <option value="foundation"<?php if ( $css_library == 'foundation' ) { ?> selected<?php } ?>>Foundation</option>
@@ -254,12 +328,12 @@ class FAQs extends Core
                             $css_cdn = get_option('rockit_faqs_css_cdn');
                             ?>
                             <p>
-                                <input type="radio" name="rockit_faqs_css_cdn" id="css-cdn-yes" value="yes"<?php if ( $css_cdn == 'yes' ) { ?> checked<?php } ?>>
-                                <label for="css-cdn-yes">Yes</label>
+                                <input type="radio" name="rockit_faqs_css_cdn" id="rockit_faqs_css_cdn_yes" value="yes"<?php if ( $css_cdn == 'yes' ) { ?> checked<?php } ?>>
+                                <label for="rockit_faqs_css_cdn_yes">Yes</label>
                             </p>
                             <p>
-                                <input type="radio" name="rockit_faqs_css_cdn" id="css-cdn-no" value="no"<?php if ( $css_cdn == 'no' ) { ?> checked<?php } ?>>
-                                <label for="css-cdn-no">No</label>
+                                <input type="radio" name="rockit_faqs_css_cdn" id="rockit_faqs_css_cdn_no" value="no"<?php if ( $css_cdn == 'no' ) { ?> checked<?php } ?>>
+                                <label for="rockit_faqs_css_cdn_no">No</label>
                             </p>
                         </td>
                     </tr>
@@ -273,10 +347,9 @@ class FAQs extends Core
                             <?php
                             $javascript_library = get_option('rockit_faqs_javascript_library');
                             ?>
-                            <select name="rockit_faqs_javascript_library">
-                                <option value="alpinejs"<?php if ( $css_library == 'alpinejs' || $css_library == '' ) { ?> selected<?php } ?>>AlpineJS</option>
-                                <option value="zeptojs"<?php if ( $css_library == 'zeptojs' ) { ?> selected<?php } ?>>zepto.js</option>
-                                <option value="jquery"<?php if ( $css_library == 'jquery' ) { ?> selected<?php } ?>>jQuery (WordPress)</option>
+                            <select name="rockit_faqs_javascript_library" id="rockit_faqs_javascript_library">
+                                <option value="jquery"<?php if ( $css_library == 'jquery' || $css_library == '' ) { ?> selected<?php } ?>>jQuery (WordPress)</option>
+                                <option value="alpinejs"<?php if ( $css_library == 'alpinejs' ) { ?> selected<?php } ?>>AlpineJS</option>
                                 <option value="none"<?php if ( $css_library == 'none' ) { ?> selected<?php } ?>>None</option>
                             </select>
                         </td>
@@ -288,12 +361,12 @@ class FAQs extends Core
                             $javascript_cdn = get_option('rockit_faqs_javascript_cdn');
                             ?>
                             <p>
-                                <input type="radio" name="rockit_faqs_javascript_cdn" id="javascript-cdn-yes" value="yes"<?php if ( $javascript_cdn == 'yes' ) { ?> checked<?php } ?>>
-                                <label for="javascript-cdn-yes">Yes</label>
+                                <input type="radio" name="rockit_faqs_javascript_cdn" id="rockit_faqs_javascript_cdn_yes" value="yes"<?php if ( $javascript_cdn == 'yes' ) { ?> checked<?php } ?>>
+                                <label for="rockit_faqs_javascript_cdn_yes">Yes</label>
                             </p>
                             <p>
-                                <input type="radio" name="rockit_faqs_javascript_cdn" id="javascript-cdn-no" value="no"<?php if ( $javascript_cdn == 'no' ) { ?> checked<?php } ?>>
-                                <label for="javascript-cdn-no">No</label>
+                                <input type="radio" name="rockit_faqs_javascript_cdn" id="rockit_faqs_javascript_cdn_no" value="no"<?php if ( $javascript_cdn == 'no' ) { ?> checked<?php } ?>>
+                                <label for="rockit_faqs_javascript_cdn_no">No</label>
                             </p>
                         </td>
                     </tr>
@@ -319,7 +392,7 @@ class FAQs extends Core
                 <tr valign="top">
                     <th scope="row">Number of FAQs</th>
                     <td>
-                        <input type="number" name="sc-number-of-faqs" id="sc-number-of-faqs" step="1" min="1" value="0">
+                        <input type="number" name="sc_number_of_faqs" id="sc_number_of_faqs" step="1" min="1" value="0">
                         <p class="description">Limit how many FAQs to display, setting to <strong>0</strong> will show all available results</p>
                     </td>
                 </tr>
@@ -327,12 +400,12 @@ class FAQs extends Core
                     <th scope="row">Random order?</th>
                     <td>
                         <p>
-                            <input type="radio" name="sc-random-order" id="sc-random-order-yes" value="yes">
-                            <label for="sc-random-order-yes">Yes</label>
+                            <input type="radio" name="sc_random_order" id="sc_random_order_yes" value="yes">
+                            <label for="sc_random_order_yes">Yes</label>
                         </p>
                         <p>
-                            <input type="radio" name="sc-random-order" id="sc-random-order-no" value="no" checked>
-                            <label for="sc-random-order-no">No</label>
+                            <input type="radio" name="sc_random_order" id="sc_random_order_no" value="no" checked>
+                            <label for="sc_random_order_no">No</label>
                         </p>
                         <p class="description">By default FAQs are ordered by <strong>date ascending</strong> (oldest first)</p>
                     </td>
@@ -341,12 +414,12 @@ class FAQs extends Core
                     <th scope="row">Show category filter?</th>
                     <td>
                         <p>
-                            <input type="radio" name="sc-show-category-filter" id="sc-show-category-filter-yes" value="yes" checked>
-                            <label for="sc-show-category-filter-yes">Yes</label>
+                            <input type="radio" name="sc_show_category_filter" id="sc_show_category_filter_yes" value="yes" checked>
+                            <label for="sc_show_category_filter_yes">Yes</label>
                         </p>
                         <p>
-                            <input type="radio" name="sc-show-category-filter" id="sc-show-category-filter-no" value="no">
-                            <label for="sc-show-category-filter-no">No</label>
+                            <input type="radio" name="sc_show_category_filter" id="sc_show_category_filter_no" value="no">
+                            <label for="sc_show_category_filter_no">No</label>
                         </p>
                         <p class="description">Hidden if <strong>Use Specific Category</strong> is set to <strong>Yes</strong></p>
                     </td>
@@ -362,7 +435,7 @@ class FAQs extends Core
                             ),
                         );
                         ?>
-                        <select name="sc-category" id="sc-category"<?php if ( count( $faq_categories ) == 0 ) { ?> disabled<?php } ?>>
+                        <select name="sc_category" id="sc_category"<?php if ( count( $faq_categories ) == 0 ) { ?> disabled<?php } ?>>
                             <option value="0" selected><?php if ( count( $faq_categories ) == 0 ) { ?>No categories yet<?php } else { ?>All categories<?php } ?></option>
 
                         </select>
@@ -372,7 +445,7 @@ class FAQs extends Core
                 <tr valign="top">
                     <th scope="row">Shortcode</th>
                     <td>
-                        <textarea id="sc-shortcode" class="large-text" rows="3" cols="50">[rockit option=faqs]</textarea>
+                        <textarea id="sc_shortcode" class="large-text" rows="3" cols="50">[rockit option=faqs]</textarea>
                     </td>
                 </tr>
                 <tr valign="top">
